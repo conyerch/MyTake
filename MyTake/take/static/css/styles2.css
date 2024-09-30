@@ -1,0 +1,21 @@
+/* styles.css */
+.design-img {
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    cursor: pointer;
+}
+
+.design-img:hover {
+    transform: scale(1.3); /* Scale the image to 105% of its original size */
+}
+
+#modalImage {
+    max-width: 90%;
+    max-height: 80%;
+    margin-bottom: 10px; /* Reduce or remove to move the blurb closer */
+}
+
+#modalBlurb {
+    margin-top: 5px; /* Decrease the top margin to move it closer to the image */
+    padding: 0; /* Ensure no unnecessary padding around the text */
+}
+

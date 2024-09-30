@@ -1,0 +1,462 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize T-Shirt Design</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Montserrat&family=Open+Sans:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
+    <style>
+        #canvas-container {
+            border: 1px solid black;
+            position: relative;
+            width: 700px; /* Set width to match the canvas */
+            height: 544px; /* Set height to match the canvas */
+        }
+        .container-center {
+            display: flex;
+            justify-content: center; /* Horizontally center */
+            align-items: center; /* Vertically center */
+            height: 100vh; /* Optional: Adjust for vertical centering */
+        }
+        .control-panel {
+            display: flex;
+            justify-content: center; /* Center the control panel buttons */
+            gap: 15px; /* Space between buttons */
+            padding: 10px;
+            background-color: #f8f9fa; /* Light background for contrast */
+            position: sticky; /* Keep at top when scrolling */
+            top: 0; /* Stick to the top of the viewport */
+            z-index: 100; /* Ensure it stays above other content */
+            border-bottom: 1px solid #ccc; /* Add a bottom border for separation */
+        }
+        .options-panel {
+            display: none; /* Initially hidden */
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            background-color: #ccc; /* Gray background */
+            padding: 5px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            width: auto;
+            white-space: nowrap; /* Keeps everything in a single line */
+            z-index: 1000; /* Ensure it stays on top */
+        }
+        .style-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin: 0 5px;
+        }
+        .style-btn.active {
+            background-color: #ddd; /* Highlight when active */
+            border-radius: 4px;
+        }
+        .checkmark {
+            color: black;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+        .canvas-wrapper {
+            padding: 20px; /* Padding inside the border */
+            border: 5px solid #000; /* 5px black border */
+            display: inline-block; /* Keeps the wrapper size around the canvas */
+            background-color: #f8f9fa; /* Optional background color */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="control-panel">
+    <!-- Text Controls -->
+    <button onclick="addTextBox()">Add Text</button>
+    
+    <div class="btn-group">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="addMaskDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Add Mask
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="addMaskDropdown">
+            <li><a class="dropdown-item" href="#" id="addCircleMask">Circle <span id="circle-check" class="checkmark" style="display:none;">✔</span></a></li>
+            <li><a class="dropdown-item" href="#" id="addSquareMask">Square <span id="square-check" class="checkmark" style="display:none;">✔</span></a></li>
+        </ul>
+    </div>
+
+    <button onclick="applyClip()">Apply Mask</button>
+    
+    <!-- Button to save or export the image -->
+    <button onclick="exportDesign()">Save as PNG</button>
+
+    <button onclick="resetCanvas()">Reset Canvas</button>
+</div>
+
+
+<div class="container-center">
+    <div id="canvas-container">
+        <canvas id="designCanvas" width="700" height="544"></canvas>
+    </div>
+<div>
+
+
+<div id="options-panel" class="options-panel">
+    <!-- Font Size -->
+    <label for="font-size">Size:</label>
+    <input type="number" id="font-size" value="30" min="10" max="100">
+    
+    <!-- Font Family -->
+    <label for="font-family">Font:</label>
+    <select id="font-family">
+        <option value="Arial" style="font-family: Arial;">Arial</option>
+        <option value="Times New Roman" style="font-family: 'Times New Roman';">Times New Roman</option>
+        <option value="Courier New" style="font-family: 'Courier New';">Courier New</option>
+        <option value="Georgia" style="font-family: Georgia;">Georgia</option>
+        <option value="Verdana" style="font-family: Verdana;">Verdana</option>
+        <option value="Helvetica" style="font-family: Helvetica;">Helvetica</option>
+        <option value="Comic Sans MS" style="font-family: 'Comic Sans MS';">Comic Sans MS</option>
+        <option value="Impact" style="font-family: Impact;">Impact</option>
+        <option value="Tahoma" style="font-family: Tahoma;">Tahoma</option>
+        <option value="Palatino" style="font-family: Palatino;">Palatino</option>
+        <option value="Lobster" style="font-family: Lobster;">Lobster</option>
+        <option value="Montserrat" style="font-family: Montserrat;">Montserrat</option>
+        <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
+        <option value="Roboto" style="font-family: Roboto;">Roboto</option>
+    </select>
+
+    <button id="bold-btn" class="style-btn"><i class="fas fa-bold"></i></button>
+    <button id="italic-btn" class="style-btn"><i class="fas fa-italic"></i></button>
+    <button id="underline-btn" class="style-btn"><i class="fas fa-underline"></i></button>
+
+    <!-- Font Color -->
+    <label for="font-color">Color:</label>
+    <input type="color" id="font-color" value="#000000">
+    
+</div>
+
+<script>
+    // Set up the Fabric.js canvas
+    const canvas = new fabric.Canvas('designCanvas');
+    let currentShape = null;
+
+    fabric.Image.fromURL('{% static "TOKYO4.png" %}', function(img) {
+        img.scaleToWidth(canvas.width); // Scale image to fit the canvas width
+        img.scaleToHeight(canvas.height); // Scale image to fit the canvas height
+        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas)); // Set image as background
+    });
+
+    let selectedText = null; // Track the currently selected text object
+
+
+    // Add text to the canvas
+    function addTextBox() {
+        const text = new fabric.Textbox('Edit Me', {
+            left: 100,
+            top: 100,
+            fontSize: 30,
+            fill: '#000000',
+            fontFamily: 'Arial',
+            fontWeight: 'normal',
+            editable: true
+            
+        });
+        canvas.add(text);
+
+        // Set event listener for when the text box is clicked
+        text.on('selected', function() {
+            selectedText = text;
+            showOptionsPanel(); // Show the options panel when text is clicked
+        });
+
+        canvas.on('selection:cleared', function() {
+            selectedText = null;
+            hideOptionsPanel(); // Hide the options panel when nothing is selected
+        });
+
+        text.on('moving', function() {
+            updateOptionsPanelPosition();
+        });
+        canvas.setActiveObject(text);
+        canvas.renderAll();
+    }
+
+    function updateOptionsPanelPosition() {
+        if (selectedText) {
+            const optionsPanel = document.getElementById('options-panel');
+            const textBoundingBox = selectedText.getBoundingRect();
+            const canvasBoundingBox = canvas.upperCanvasEl.getBoundingClientRect();
+
+            // Position the options panel relative to the text box location
+            const topPosition = canvasBoundingBox.top + textBoundingBox.top - optionsPanel.offsetHeight - 10;
+            const leftPosition = canvasBoundingBox.left + textBoundingBox.left;
+            
+            optionsPanel.style.top = `${topPosition}px`;
+            optionsPanel.style.left = `${leftPosition}px`;
+        }
+    }
+
+    function showOptionsPanel() {
+        if (selectedText) {
+            // Show the panel
+            const optionsPanel = document.getElementById('options-panel');
+            const textBoundingBox = selectedText.getBoundingRect();
+            const canvasBoundingBox = canvas.upperCanvasEl.getBoundingClientRect();
+
+            // Show the panel
+            optionsPanel.style.display = 'flex';
+
+            // Set position above the text box, relative to the canvas
+            const topPosition = canvasBoundingBox.top + textBoundingBox.top - optionsPanel.offsetHeight - 10;
+            const leftPosition = canvasBoundingBox.left + textBoundingBox.left;
+
+            optionsPanel.style.top = `${topPosition}px`;
+            optionsPanel.style.left = `${leftPosition}px`;
+            
+            // Populate the options with the selected text properties
+            document.getElementById('font-size').value = selectedText.fontSize;
+            document.getElementById('font-family').value = selectedText.fontFamily;
+            document.getElementById('font-color').value = selectedText.fill;
+            document.getElementById('font-bold').checked = selectedText.fontWeight === 'bold';
+        }
+    }
+
+    function hideOptionsPanel() {
+        document.getElementById('options-panel').style.display = 'none'; // Hide the panel
+    }
+
+    // Function to update text properties dynamically
+    function updateTextProperties() {
+        if (selectedText) {
+            selectedText.set({
+                fontSize: parseInt(document.getElementById('font-size').value),
+                fontFamily: document.getElementById('font-family').value,  // Update font family
+                fill: document.getElementById('font-color').value,
+                fontWeight: document.getElementById('bold-btn').classList.contains('active') ? 'bold' : 'normal',
+                fontStyle: document.getElementById('italic-btn').classList.contains('active') ? 'italic' : 'normal',
+                underline: document.getElementById('underline-btn').classList.contains('active')
+            });
+
+            canvas.renderAll(); // Re-render the canvas to apply changes
+        }
+    }
+
+    function addCircle() {
+        if (currentShape) {
+            canvas.remove(currentShape); // Remove the existing shape
+        }
+        currentShape = new fabric.Circle({
+            left: 150,
+            top: 150,
+            radius: 150,
+            fill: 'transparent', 
+            stroke: 'black',
+            strokeWidth: 3,
+            selectable: true,
+            hasControls: true, 
+            hasBorders: true
+        });
+        canvas.add(currentShape);
+        canvas.setActiveObject(currentShape);
+        canvas.renderAll();
+    }
+
+    // Function to add a square (if no shape exists)
+    function addSquare() {
+        if (currentShape) {
+            canvas.remove(currentShape); // Remove the existing shape
+        }
+        currentShape = new fabric.Rect({
+            left: 150,
+            top: 150,
+            width: 200,
+            height: 200,
+            fill: 'transparent',
+            stroke: 'black',
+            strokeWidth: 3,
+            selectable: true,
+            hasControls: true,
+            hasBorders: true
+        });
+        canvas.add(currentShape);
+        canvas.setActiveObject(currentShape);
+        canvas.renderAll();
+    }
+
+    // Function to apply the clip path to the background image
+    function applyClip() {
+        if (currentShape && canvas.backgroundImage) {
+            // Clone the current shape to use as a clip path
+            const clipShape = currentShape.toObject();
+            clipShape.evented = false;
+            clipShape.selectable = false;
+            
+            // Apply the clip path to the background image
+            canvas.clipPath = new fabric[currentShape.type === 'circle' ? 'Circle' : 'Rect'](clipShape);
+            
+            // Optional: Remove the shape after clipping
+            canvas.remove(currentShape);
+            currentShape = null; // Clear the shape reference
+
+            // Re-render the canvas
+            canvas.renderAll();
+        }
+    }
+
+    // Event listeners to update the text as changes are made in the options panel
+    document.getElementById('font-size').addEventListener('input', updateTextProperties);
+    document.getElementById('font-family').addEventListener('change', updateTextProperties);
+    document.getElementById('font-color').addEventListener('input', updateTextProperties);
+    
+
+    // Add a circle mask to the canvas
+    
+    // Export the design (either send to backend or download locally)
+    function exportDesign() {
+        const scaleFactor = 3; // Increase resolution by 3x (or any factor)
+
+        // Temporarily scale up the canvas
+        const originalWidth = canvas.width;
+        const originalHeight = canvas.height;
+        canvas.setDimensions({ width: originalWidth * scaleFactor, height: originalHeight * scaleFactor });
+        canvas.setZoom(scaleFactor);
+
+        // Export high-resolution PNG
+        const designData = canvas.toDataURL({
+            format: 'png',
+            quality: 1.0
+        });
+
+        // Reset canvas to original size
+        canvas.setZoom(1);
+        canvas.setDimensions({ width: originalWidth, height: originalHeight });
+
+        // Trigger download
+        downloadImage(designData, 'high_resolution_design.png');
+    }
+
+    // Helper function to download the image
+    function downloadImage(data, filename = 'untitled.png') {
+        const a = document.createElement('a');
+        a.href = data;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Toggle text styles
+    document.getElementById('bold-btn').addEventListener('click', function() {
+        toggleTextStyle('fontWeight', 'bold');
+        this.classList.toggle('active');
+    });
+    document.getElementById('italic-btn').addEventListener('click', function() {
+        toggleTextStyle('fontStyle', 'italic');
+        this.classList.toggle('active');
+    });
+    document.getElementById('underline-btn').addEventListener('click', function() {
+        toggleTextStyle('underline', true);
+        this.classList.toggle('active');
+    });
+
+    function toggleTextStyle(style, value) {
+        if (selectedText) {
+            const currentStyle = selectedText.get(style) === value ? '' : value;
+            selectedText.set(style, currentStyle);
+            canvas.renderAll();
+        }
+    }
+
+    function deleteSelectedObject() {
+        const activeObject = canvas.getActiveObject(); // Get the currently selected object
+        if (activeObject) {
+
+            if (activeObject.type === 'textbox' && activeObject.isEditing) {
+                // If the object is a text box and it's being edited, don't delete it
+                return;
+            }
+            if (canvas.clipPath === activeObject) {
+                canvas.clipPath = null; // Clear the clip path
+            }
+            canvas.remove(activeObject); // Remove the object from the canvas
+            canvas.discardActiveObject(); // Deselect the object
+            canvas.renderAll(); // Re-render the canvas
+        }
+    }
+
+    // Add an event listener to listen for the 'Delete' key press
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Delete' || event.key === 'Backspace') {
+            deleteSelectedObject();
+        }
+
+    });
+
+    const gridSize = 10;
+
+// Add an event listener to handle snapping while moving an object
+    canvas.on('object:moving', function(event) {
+        const obj = event.target;
+
+        // Snap the object's left and top positions to the nearest grid point
+        obj.set({
+            left: Math.round(obj.left / gridSize) * gridSize,
+            top: Math.round(obj.top / gridSize) * gridSize
+        });
+
+        // Re-render the canvas to apply changes
+        canvas.renderAll();
+    });
+
+    function resetCanvas() {
+    // Clear all objects from the canvas (shapes, texts, etc.)
+        canvas.clear();
+        canvas.clipPath = null;
+
+        // Reapply the background image
+        fabric.Image.fromURL('{% static "NYC2.png" %}', function(img) {
+            img.scaleToWidth(canvas.width); // Scale image to fit the canvas width
+            img.scaleToHeight(canvas.height); // Scale image to fit the canvas height
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas)); // Set image as background
+        });
+
+        // Reset currentShape reference
+        currentShape = null;
+    }
+
+    document.getElementById('addCircleMask').addEventListener('click', function() {
+        addCircle(); // Call function to add circle
+        updateCheckmark('circle'); // Update checkmark
+    });
+
+    // Event listener for adding a Square Mask
+    document.getElementById('addSquareMask').addEventListener('click', function() {
+        addSquare(); // Call function to add square
+        updateCheckmark('square'); // Update checkmark
+    });
+
+    // Function to update the checkmark next to the selected shape in the dropdown
+    function updateCheckmark(shape) {
+        document.getElementById('circle-check').style.display = shape === 'circle' ? 'inline' : 'none';
+        document.getElementById('square-check').style.display = shape === 'square' ? 'inline' : 'none';
+    }
+
+    $(document).ready(function() {
+            $('#font-family').select2();
+        });
+
+</script>
+
+</body>
+</html>

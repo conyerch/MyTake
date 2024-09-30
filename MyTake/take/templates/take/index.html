@@ -1,0 +1,136 @@
+{% extends 'take/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/hero.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles2.css' %}">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+
+
+    <div class="hero-image">
+        <div class="hero-text">
+            <h1 class="display-4 fw-bold text-white">Create Stunning, Custom Visuals in Seconds</h1>
+            <p class="lead text-white">Powered by AI, MyTake makes professional-level, customizable artwork accessible to everyone.</p>
+            <a href="{% url 'chat_gpt' %}" class="btn btn-primary btn-lg">Get Started Now</a>
+            <a href="{% url 'img_gallery' %}" class="btn btn-secondary btn-lg">Browse Designs</a>        
+        </div>
+      </div>
+
+    <section class="how-it-works py-5">
+
+        <div class="container">
+            <h2 class="text-center">How It Works</h2>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <img src="{% static 'WRITING.png' %}" alt="Input" width="200" height="200">
+                    <h4>Step 1: Input Your Preferences</h4>
+                    <p>Choose your place, mood, style, and setting to guide the AI. Then, highlight any important features you want the visual to capture.</p>
+                </div>
+                <div class="col-md-4">
+                    <img src="{% static 'AI.png' %}" alt="AI" width="200" height="200">
+                    <h4>Step 2: Watch the AI Work</h4>
+                    <p>Our AI instantly generates high-quality visuals based on your input. Using random noise, one set of inputs generates three possible images for you to choose from!</p>
+                </div>
+                <div class="col-md-4">
+                    <img src="{% static 'CHECK.png' %}" alt="Design" width="200" height="200">
+                    <h4>Step 3: Get Your Custom Visual</h4>
+                    <p>Place your design on a poster, coffee mug, t-shirt, bookmark, and more and we'll mail it to you directly. Or, download your design directly and customize with ease.</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section id="design-showcase" class="design-showcase py-5 bg-light">
+
+        <div class="container">
+
+            <h2 class="text-center">Explore Designs Created by Our Users</h2>
+
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+
+                <div class="modal-dialog modal-lg">
+
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+
+                            <h5 class="modal-title" id="imageModalLabel">Image Title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                        </div>
+
+                        <div class="modal-body">
+                            <p id="modalBlurb">Blurb goes here...</p>
+                            <img src="" id="modalImage" class="img-fluid mb-3" alt="Expanded Image" height = "800" width = "800">
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row mb-1">
+                
+                <div class="col-md-4 md-4">
+                    <img src="{% static 'LONDON1.png' %}" alt="Design 1" class="img-fluid mb-1 design-img" onclick = "openModal(this, 'Distinctive Architecture', 'Place: London Bridge, Mood: Serene, Style: Watercolor')">
+                    <h5>Distinctive Architecture</h5>
+                    <p>Place: London Bridge, Mood: Serene, Style: Watercolor</p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <img src="{% static 'TOKYO2.png' %}" alt="Design 2" class="img-fluid mb-1 design-img" onclick = "openModal(this, 'Urban Skyline', 'Place: Tokyo Skyline, Mood: Gentle, Style: Watercolor')">
+                    <h5>Urban Nightscapes</h5>
+                    <p>Place: Tokyo, Mood: Restless, Style: Ink Painting</p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <img src="{% static 'GREATWALL.png' %}" alt="Design 3" class="img-fluid mb-1 design-img">
+                    <h5>National Landmarks</h5>
+                    <p>Place: The Great Wall, Mood: Restless, Style: Light Ink Painting</p>
+                </div>
+                    
+            </div>
+
+            <div class="row mb-1">
+                
+                <div class="col-md-4 md-4">
+                    <img src="{% static 'FISHING.png' %}" alt= "Design 4" class= "img-fluid mb-1 design-img">
+                    <h5>Cultural Pieces</h5>
+                    <p>Place: Southeast Asian Village, Setting: Morning, Style: Light Ink</p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <img src="{% static 'SNOWCABIN.png' %}" alt= "Design 5" class= "img-fluid mb-1 design-img">
+                    <h5>Moodscapes</h5>
+                    <p>Setting: Mountain Cabin, Mood: Isolated, Snowing, Style: Blotted Ink Painting</p>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <img src="{% static 'LIGHTHOUSE.png' %}" alt= "Design 6" class= "img-fluid mb-1 design-img">
+                    <h5>Vintage Sketches</h5>
+                    <p>Visual: Abandoned Lighthouse, Mood: Wary, Style: Rough Sketch</p>
+                </div>
+                
+            </div>
+
+            <script src = "{% static 'js/openModal.js' %}"></script>
+
+        </div>
+
+    </section>
+
+    <section class="cta py-5 text-center">
+        <div class="container">
+            <h2>Ready to Create Your Custom Design?</h2>
+            <p>  </p>
+            <a href="{% url 'chat_gpt' %}" class="btn btn-primary btn-lg">Start Designing Now</a>
+        </div>
+    </section>
+
+{% endblock content %}

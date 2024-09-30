@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+}
+
+h1 {
+    margin: 20px 0;
+}
+
+.gallery {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+#modalImage {
+    max-width: 90%;
+    max-height: 80%;
+    margin-bottom: 10px; /* Reduce or remove to move the blurb closer */
+}
+
+#modalBlurb {
+    margin-top: 5px; /* Decrease the top margin to move it closer to the image */
+    padding: 0; /* Ensure no unnecessary padding around the text */
+}
