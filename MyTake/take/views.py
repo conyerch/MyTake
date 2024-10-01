@@ -8,7 +8,21 @@ from django.http import JsonResponse
 from PIL import Image
 import base64
 from io import BytesIO
+import os, requests
 # Create your views here.
+
+def image_gallery(request):
+    # This is the view to render the main page with images
+    images = [
+        {'name': 'Tokyo', 'url': 'TOKYO1.png'}
+    ]
+    return render(request, 'take/design.html', {'images': images})
+
+def load_image_for_customization(request, image_name):
+    # This view is used to load the image dynamically when clicked
+    # Assumes 'image_name' is passed as a URL parameter and it returns a JSON response.
+    image_url = f'/static/{image_name}'
+    return JsonResponse({'image_url': image_url})
 
 class DesignPageView(View):
     template_name = 'myapp/design_page.html'
@@ -158,3 +172,38 @@ class ImageView(View):
             }
         ]
         return render(request, 'take/img_gallery.html', {'images': images})
+    
+def upload_file_to_printful(file_path, api_key):
+    url = "https://api.printful.com/files"
+    headers = {
+        "Authorization": f"Bearer {api_key}"
+    }
+    
+    # Open the file from the static directory
+    with open(file_path, 'rb') as file_data:
+        files = {
+            'file': file_data
+        }
+        response = requests.post(url, headers=headers, files=files)
+    
+    return response.json()
+
+# Django view to upload the file to Printful
+def upload_design_to_printful(request):
+    # Your Printful API key
+    PRINTFUL_API_KEY = "YOUR_PRINTFUL_API_KEY"
+    
+    # Path to the PNG file in your static directory
+    file_name = "your_design.png"
+    file_path = os.path.join(settings.STATIC_ROOT, file_name)
+
+    if not os.path.exists(file_path):
+        return JsonResponse({"error": "File does not exist"}, status=400)
+
+    # Upload the file to Printful
+    upload_response = upload_file_to_printful(file_path, PRINTFUL_API_KEY)
+
+    if upload_response.get('code') == 200:
+        return JsonResponse({"message": "File uploaded successfully", "data": upload_response}, status=200)
+    else:
+        return JsonResponse({"error": "Failed to upload file", "data": upload_response}, status=400)

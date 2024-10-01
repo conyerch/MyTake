@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customize T-Shirt Design</title>
+    <title>Image Gallery with Customization</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -14,11 +15,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-
     <style>
         #canvas-container {
             border: 1px solid black;
             position: relative;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
             width: 700px; /* Set width to match the canvas */
             height: 544px; /* Set height to match the canvas */
         }
@@ -82,85 +85,96 @@
 </head>
 <body>
 
-<div class="control-panel">
-    <!-- Text Controls -->
-    <button onclick="addTextBox()">Add Text</button>
-    
-    <div class="btn-group">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="addMaskDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            Add Mask
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="addMaskDropdown">
-            <li><a class="dropdown-item" href="#" id="addCircleMask">Circle <span id="circle-check" class="checkmark" style="display:none;">✔</span></a></li>
-            <li><a class="dropdown-item" href="#" id="addSquareMask">Square <span id="square-check" class="checkmark" style="display:none;">✔</span></a></li>
-        </ul>
+<div class="container mt-4">
+    <h2>Click on an image to customize</h2>
+    <div class="row">
+        {% for image in images %}
+        <div class="col-md-4">
+            <img src="{% static image.url %}" class="img-fluid" alt="{{ image.name }}"
+                 onclick="openModal('{{ image.url }}')" data-bs-toggle="modal" data-bs-target="#customizerModal">
+        </div>
+        {% endfor %}
     </div>
-
-    <button onclick="applyClip()">Apply Mask</button>
-    
-    <!-- Button to save or export the image -->
-    <button onclick="exportDesign()">Save as PNG</button>
-
-    <button onclick="resetCanvas()">Reset Canvas</button>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="customizerModal" tabindex="-1" aria-labelledby="customizerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customizerModalLabel">Customize Your Design</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Control Panel for Customization -->
+                <div class="control-panel mb-3">
+                    <button onclick="addTextBox()" class="btn btn-secondary">Add Text</button>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="addMaskDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Add Mask
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="addMaskDropdown">
+                            <li><a class="dropdown-item" href="#" id="addCircleMask">Circle <span id="circle-check" class="checkmark" style="display:none;">✔</span></a></li>
+                            <li><a class="dropdown-item" href="#" id="addSquareMask">Square <span id="square-check" class="checkmark" style="display:none;">✔</span></a></li>
+                        </ul>
+                    </div>
+                    <button onclick="applyClip()" class="btn btn-secondary">Apply Mask</button>
+                    <button onclick="resetCanvas()" class="btn btn-secondary">Reset Canvas</button>
+                    <button onclick="exportDesign()" class="btn btn-success">Save as PNG</button>
+                </div>
 
-<div class="container-center">
-    <div id="canvas-container">
-        <canvas id="designCanvas" width="700" height="544"></canvas>
+                <!-- Canvas for Customization -->
+                <div id="canvas-container" class="text-center">
+                    <canvas id="designCanvas" width="700" height="544"></canvas>
+                </div>
+
+                <!-- Options Panel for Text Customization -->
+                <div id="options-panel" class="options-panel">
+                    <label for="font-size">Size:</label>
+                    <input type="number" id="font-size" value="30" min="10" max="100">
+                    <label for="font-family">Font:</label>
+                    <select id="font-family">
+                        <!-- Add font options -->
+                        <option value="Arial" style="font-family: Arial;">Arial</option>
+                        <option value="Times New Roman" style="font-family: 'Times New Roman';">Times New Roman</option>
+                        <!-- Add more fonts as needed -->
+                    </select>
+                    <button id="bold-btn" class="style-btn"><i class="fas fa-bold"></i></button>
+                    <button id="italic-btn" class="style-btn"><i class="fas fa-italic"></i></button>
+                    <button id="underline-btn" class="style-btn"><i class="fas fa-underline"></i></button>
+                    <label for="font-color">Color:</label>
+                    <input type="color" id="font-color" value="#000000">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveDesign()">Save Design</button>
+            </div>
+        </div>
     </div>
-<div>
-
-
-<div id="options-panel" class="options-panel">
-    <!-- Font Size -->
-    <label for="font-size">Size:</label>
-    <input type="number" id="font-size" value="30" min="10" max="100">
-    
-    <!-- Font Family -->
-    <label for="font-family">Font:</label>
-    <select id="font-family">
-        <option value="Arial" style="font-family: Arial;">Arial</option>
-        <option value="Times New Roman" style="font-family: 'Times New Roman';">Times New Roman</option>
-        <option value="Courier New" style="font-family: 'Courier New';">Courier New</option>
-        <option value="Georgia" style="font-family: Georgia;">Georgia</option>
-        <option value="Verdana" style="font-family: Verdana;">Verdana</option>
-        <option value="Helvetica" style="font-family: Helvetica;">Helvetica</option>
-        <option value="Comic Sans MS" style="font-family: 'Comic Sans MS';">Comic Sans MS</option>
-        <option value="Impact" style="font-family: Impact;">Impact</option>
-        <option value="Tahoma" style="font-family: Tahoma;">Tahoma</option>
-        <option value="Palatino" style="font-family: Palatino;">Palatino</option>
-        <option value="Lobster" style="font-family: Lobster;">Lobster</option>
-        <option value="Montserrat" style="font-family: Montserrat;">Montserrat</option>
-        <option value="Open Sans" style="font-family: 'Open Sans';">Open Sans</option>
-        <option value="Roboto" style="font-family: Roboto;">Roboto</option>
-    </select>
-
-    <button id="bold-btn" class="style-btn"><i class="fas fa-bold"></i></button>
-    <button id="italic-btn" class="style-btn"><i class="fas fa-italic"></i></button>
-    <button id="underline-btn" class="style-btn"><i class="fas fa-underline"></i></button>
-
-    <!-- Font Color -->
-    <label for="font-color">Color:</label>
-    <input type="color" id="font-color" value="#000000">
-    
 </div>
+
+<!-- Bootstrap JS -->
 
 <script>
-    // Set up the Fabric.js canvas
     const canvas = new fabric.Canvas('designCanvas');
     let currentShape = null;
 
-    fabric.Image.fromURL('{% static "TOKYO4.png" %}', function(img) {
-        img.scaleToWidth(canvas.width); // Scale image to fit the canvas width
-        img.scaleToHeight(canvas.height); // Scale image to fit the canvas height
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas)); // Set image as background
-    });
+    let img_url = ""
 
-    let selectedText = null; // Track the currently selected text object
+    // Function to open modal with selected image
+    function openModal(imageUrl) {
+        img_url = imageUrl
+        fabric.Image.fromURL("{% static '' %}" + img_url, function(img) {
+            img.scaleToWidth(canvas.width);
+            img.scaleToHeight(canvas.height);
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+        });
+    }
 
+    let selectedText = null; 
 
-    // Add text to the canvas
+    // Function to add text box
     function addTextBox() {
         const text = new fabric.Textbox('Edit Me', {
             left: 100,
@@ -247,6 +261,7 @@
                 fontStyle: document.getElementById('italic-btn').classList.contains('active') ? 'italic' : 'normal',
                 underline: document.getElementById('underline-btn').classList.contains('active')
             });
+
             canvas.renderAll(); // Re-render the canvas to apply changes
         }
     }
@@ -424,7 +439,7 @@
         canvas.clipPath = null;
 
         // Reapply the background image
-        fabric.Image.fromURL('{% static "NYC2.png" %}', function(img) {
+        fabric.Image.fromURL("{% static '' %}" + img_url, function(img) {
             img.scaleToWidth(canvas.width); // Scale image to fit the canvas width
             img.scaleToHeight(canvas.height); // Scale image to fit the canvas height
             canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas)); // Set image as background
@@ -454,7 +469,6 @@
     $(document).ready(function() {
             $('#font-family').select2();
         });
-
 </script>
 
 </body>

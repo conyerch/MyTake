@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import Index, SignUpView, Dashboard, ImageView, chat_gpt, DesignPageView
+from .views import Index, SignUpView, Dashboard, ImageView, chat_gpt, DesignPageView, image_gallery, load_image_for_customization, upload_design_to_printful
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
@@ -13,6 +13,9 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name = 'take/logout.html'), name='logout'),
     path('gallery/', ImageView.as_view(), name = 'img_gallery'),
     path('chat/', chat_gpt, name = 'chat_gpt'),
-    path('custom/', DesignPageView.as_view(), name = 'custom')
+    path('custom/', DesignPageView.as_view(), name = 'custom'),
+    path('design/', image_gallery, name = 'design'),
+    path('load-image/<str:image_name>/', load_image_for_customization, name='load_image'),
+    path('upload/', upload_design_to_printful, name = 'upload')
 ] + static(settings.STATIC_URL)
 
