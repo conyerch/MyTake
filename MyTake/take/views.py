@@ -182,7 +182,7 @@ def upload_file_to_printful(file_path, api_key):
     # Open the file from the static directory
     with open(file_path, 'rb') as file_data:
         files = {
-            'file': file_data
+            'file': ('file.png', file_data, 'image/png')  # Ensure file is named and mime type is correct
         }
         response = requests.post(url, headers=headers, files=files)
     
@@ -191,17 +191,19 @@ def upload_file_to_printful(file_path, api_key):
 # Django view to upload the file to Printful
 def upload_design_to_printful(request):
     # Your Printful API key
-    PRINTFUL_API_KEY = "YOUR_PRINTFUL_API_KEY"
+    PRINTFUL_API_KEY = "TTU2dfCpJDWmbwJqUv8dy4y8nBVDKxSYnQkgyRKd"
     
     # Path to the PNG file in your static directory
-    file_name = "your_design.png"
+    file_name = "LIGHTHOUSE.png"
     file_path = os.path.join(settings.STATIC_ROOT, file_name)
+    file_path2 = "/Users/christopherconyersiv/MyTake-Django/MyTake/take/static/LIGHTHOUSE.png"
+    #print(file_pat2)
 
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path2):
         return JsonResponse({"error": "File does not exist"}, status=400)
 
     # Upload the file to Printful
-    upload_response = upload_file_to_printful(file_path, PRINTFUL_API_KEY)
+    upload_response = upload_file_to_printful(file_path2, PRINTFUL_API_KEY)
 
     if upload_response.get('code') == 200:
         return JsonResponse({"message": "File uploaded successfully", "data": upload_response}, status=200)
