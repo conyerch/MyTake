@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import Index, SignUpView, Dashboard, ImageView, chat_gpt, DesignPageView, image_gallery, load_image_for_customization, upload_design_to_printful, upload_to_photodeck
+from .views import Index, SignUpView, Dashboard, ImageView, chat_gpt, DesignPageView, image_gallery, load_image_for_customization, upload_design_to_printful, upload_to_photodeck, photodeck_view
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
@@ -16,6 +16,7 @@ urlpatterns = [
     path('custom/', DesignPageView.as_view(), name = 'custom'),
     path('design/', image_gallery, name = 'design'),
     path('load-image/<str:image_name>/', load_image_for_customization, name='load_image'),
-    path('upload/', upload_to_photodeck, name='upload_to_photodeck')
+    path('upload/', upload_to_photodeck, name='upload_to_photodeck'),
+    path('photodeck/', photodeck_view, name='photodeck'),  # Define the URL for this view
 ] + static(settings.STATIC_URL)
 

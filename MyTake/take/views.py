@@ -16,6 +16,9 @@ from email.utils import formatdate
 from xml.etree import ElementTree as ET
 # Create your views here.
 
+def photodeck_view(request):
+    return render(request, 'take/photodeck.html')
+
 def image_gallery(request):
     # This is the view to render the main page with images
     images = [
@@ -261,11 +264,15 @@ def initialize_upload(image_path):
 
         # Inside <media>
         media = root.find('media')
+        #print(media)
         media_uuid = media.find('uuid').text  # Inside the <media> tag
         upload_url = media.find('upload-url').text
+        #print('\n' + upload_url)
         upload_method = media.find('upload-method').text
         upload_params = {param.tag: param.text for param in media.findall('upload-params/*')}
         upload_file_param = media.find('upload-file-param').text
+        upload_location = media.find('upload-location').text
+        #print(upload_location)
 
         # Extract <media-uuid> outside of <media>
         media_uuid_outside = root.find('media-uuid').text  # Outside <media>
@@ -277,9 +284,11 @@ def initialize_upload(image_path):
             'upload_method': upload_method,
             'upload_params': upload_params,
             'upload_file_param': upload_file_param,
+            'upload_location': upload_location
+
         }
     else:
-        print("eror")
+        
         #print(f"Error: {response.status_code}, {response.text}")
         return None
 
@@ -294,15 +303,15 @@ def upload_file(image_path, upload_url, upload_params, upload_file_param):
         response = requests.post(upload_url, data=upload_params, files=files, auth=('chrisconyers4@gmail.com', '*SINGApore8'))
 
         # Debug the response for potential issues
-        print(f"Upload Response Status: {response.status_code}")
-        print(f"Upload Response Text: {response.text}")
+        #print(f"Upload Response Status: {response.status_code}")
+        #print(f"Upload Response Text: {response.text}")
 
         # Return True if the upload was successful (201 Created)
         return response.status_code == 201
 
 
 # Step 3: Confirm upload
-def confirm_upload(media_uuid, image_path):
+def confirm_upload(media_uuid, image_path, location):
     api_key = settings.PHOTODECK_API_KEY
     api_secret = settings.PHOTODECK_API_SECRET
     request_url = f'/medias/{media_uuid}.xml'
@@ -320,7 +329,7 @@ def confirm_upload(media_uuid, image_path):
 
     # Prepare data to finalize upload
     media_params = {
-        'media[content][upload_location]': 'REQUEST',
+        'media[content][upload_location]': location,
         'media[content][file_name]': os.path.basename(image_path),
         'media[content][file_size]': os.path.getsize(image_path),
         'media[content][mime_type]': 'image/png',  # assuming the image is PNG
@@ -358,7 +367,7 @@ def upload_to_photodeck(request):
 
         if upload_success:
             # Step 3: Confirm the upload using media_uuid from <media>
-            if confirm_upload(upload_info['media_uuid'], image_path):
+            if confirm_upload(upload_info['media_uuid'], image_path, upload_info['upload_location']):
                 return HttpResponse('Image uploaded and confirmed successfully!')
             else:
                 return HttpResponse('Failed to confirm upload.', status=500)

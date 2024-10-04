@@ -7,7 +7,7 @@
 </head>
 <body>
     <!-- Button to load PhotoDeck -->
-    <button id="photodeckButton" onclick="loadPhotoDeck()">Go to PhotoDeck</button>
+    <button onclick="window.open('https://mytake.photodeck.com/-/galleries', '_blank')">Visit PhotoDeck</button>
 
     <!-- Container to hold the iframe -->
     <div id="photodeckContainer" style="display: none;">
@@ -18,7 +18,7 @@
     function loadPhotoDeck() {
         // Set the PhotoDeck URL in the iframe
         var iframe = document.getElementById("photodeckFrame");
-        iframe.src = "https://your-photodeck-website.com";  // Replace with your PhotoDeck URL
+        iframe.src = "https://mytake.photodeck.com/-/galleries";  //
         
         // Display the iframe
         document.getElementById("photodeckContainer").style.display = "block";
